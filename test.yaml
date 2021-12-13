@@ -1,0 +1,478 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kubectl.kubernetes.io/default-logs-container: okay1
+    poddefault.admission.kubeflow.org/poddefault-access-ml-pipeline: "6580"
+    poddefault.admission.kubeflow.org/poddefault-rok-auth: "6588"
+    prometheus.io/path: /stats/prometheus
+    prometheus.io/port: "15020"
+    prometheus.io/scrape: "true"
+    sidecar.istio.io/status: '{"initContainers":["istio-init"],"containers":["istio-proxy"],"volumes":["istio-envoy","istio-data","istio-podinfo","istio-token","istiod-ca-cert"],"imagePullSecrets":null}'
+  creationTimestamp: "2021-12-13T13:04:29Z"
+  generateName: okay1-
+  labels:
+    access-ml-pipeline: "true"
+    access-rok: "true"
+    app: okay1
+    controller-revision-hash: okay1-cd44db789
+    istio.io/rev: default
+    notebook-name: okay1
+    security.istio.io/tlsMode: istio
+    service.istio.io/canonical-name: okay1
+    service.istio.io/canonical-revision: latest
+    statefulset: okay1
+    statefulset.kubernetes.io/pod-name: okay1-0
+  name: okay1-0
+  namespace: kubeflow-user
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: StatefulSet
+    name: okay1
+    uid: 33e7f4ef-b9bb-4bb0-b4f5-745349cdce16
+  resourceVersion: "44431"
+  selfLink: /api/v1/namespaces/kubeflow-user/pods/okay1-0
+  uid: 8d5ce747-1759-4f42-b413-b9771cc46914
+spec:
+  containers:
+  - env:
+    - name: NB_PREFIX
+      value: /notebook/kubeflow-user/okay1
+    - name: ML_PIPELINE_SA_TOKEN_PATH
+      value: /var/run/secrets/ml-pipeline/token
+    - name: ROK_TOKEN
+      value: file:/var/run/secrets/rok/token
+    - name: ROK_URL
+      value: http://rok.rok.svc.cluster.local
+    - name: ROK_PARAM_REGISTER_POD_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: ROK_PARAM_REGISTER_POD_POD
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: ROK_PARAM_REGISTER_KUBERNETES_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: ROK_PARAM_REGISTER_JUPYTER_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: ROK_PARAM_REGISTER_JUPYTER_LAB
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: ROK_PARAM_REGISTER_DATASET_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: ROK_ACCOUNT
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    image: gcr.io/arrikto/jupyter-kale-py36:develop-l0-release-1.2-pre-295-g622fe91aca
+    imagePullPolicy: Never
+    name: okay1
+    ports:
+    - containerPort: 8888
+      name: notebook-port
+      protocol: TCP
+    resources:
+      requests:
+        cpu: 1m
+        memory: 1M
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /home/jovyan
+      name: workspace-okay1-s1co164ke
+    - mountPath: /dev/shm
+      name: dshm
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-editor-token-5mjr7
+      readOnly: true
+    - mountPath: /var/run/secrets/ml-pipeline
+      name: volume-ml-pipeline-token
+      readOnly: true
+    - mountPath: /var/run/secrets/rok
+      name: projected-rok-token
+      readOnly: true
+    workingDir: /home/jovyan
+  - args:
+    - proxy
+    - sidecar
+    - --domain
+    - $(POD_NAMESPACE).svc.cluster.local
+    - --serviceCluster
+    - okay1.$(POD_NAMESPACE)
+    - --proxyLogLevel=warning
+    - --proxyComponentLogLevel=misc:error
+    - --log_output_level=default:info
+    - --concurrency
+    - "2"
+    env:
+    - name: JWT_POLICY
+      value: third-party-jwt
+    - name: PILOT_CERT_PROVIDER
+      value: istiod
+    - name: CA_ADDR
+      value: istiod.istio-system.svc:15012
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: POD_NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: INSTANCE_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+    - name: SERVICE_ACCOUNT
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: spec.serviceAccountName
+    - name: HOST_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.hostIP
+    - name: CANONICAL_SERVICE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.labels['service.istio.io/canonical-name']
+    - name: CANONICAL_REVISION
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.labels['service.istio.io/canonical-revision']
+    - name: PROXY_CONFIG
+      value: |
+        {"tracing":{}}
+    - name: ISTIO_META_POD_PORTS
+      value: |-
+        [
+            {"name":"notebook-port","containerPort":8888,"protocol":"TCP"}
+        ]
+    - name: ISTIO_META_APP_CONTAINERS
+      value: okay1
+    - name: ISTIO_META_CLUSTER_ID
+      value: Kubernetes
+    - name: ISTIO_META_INTERCEPTION_MODE
+      value: REDIRECT
+    - name: ISTIO_METAJSON_ANNOTATIONS
+      value: |
+        {"poddefault.admission.kubeflow.org/poddefault-access-ml-pipeline":"6580","poddefault.admission.kubeflow.org/poddefault-rok-auth":"6588"}
+    - name: ISTIO_META_WORKLOAD_NAME
+      value: okay1
+    - name: ISTIO_META_OWNER
+      value: kubernetes://apis/apps/v1/namespaces/kubeflow-user/statefulsets/okay1
+    - name: ISTIO_META_MESH_ID
+      value: cluster.local
+    - name: TRUST_DOMAIN
+      value: cluster.local
+    image: docker.io/istio/proxyv2:1.9.0
+    imagePullPolicy: Never
+    name: istio-proxy
+    ports:
+    - containerPort: 15090
+      name: http-envoy-prom
+      protocol: TCP
+    readinessProbe:
+      failureThreshold: 30
+      httpGet:
+        path: /healthz/ready
+        port: 15021
+        scheme: HTTP
+      initialDelaySeconds: 1
+      periodSeconds: 2
+      successThreshold: 1
+      timeoutSeconds: 3
+    resources:
+      limits:
+        cpu: "2"
+        memory: 1Gi
+      requests:
+        cpu: 1m
+        memory: 1M
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsGroup: 1337
+      runAsNonRoot: true
+      runAsUser: 1337
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/istio
+      name: istiod-ca-cert
+    - mountPath: /var/lib/istio/data
+      name: istio-data
+    - mountPath: /etc/istio/proxy
+      name: istio-envoy
+    - mountPath: /var/run/secrets/tokens
+      name: istio-token
+    - mountPath: /etc/istio/pod
+      name: istio-podinfo
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-editor-token-5mjr7
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  hostname: okay1-0
+  initContainers:
+  - args:
+    - --host
+    - $(HOST_IP)
+    - --port
+    - "10101"
+    env:
+    - name: HOST_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.hostIP
+    image: gcr.io/arrikto-public/startup-lock-init@sha256:0fbe996a2f6b380d7c566ba16255ec034faec983c2661da778fe09b3e744ad21
+    imagePullPolicy: Never
+    name: startup-lock-init-container
+    resources:
+      requests:
+        cpu: 1m
+        memory: 1M
+    securityContext:
+      runAsUser: 1002
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-editor-token-5mjr7
+      readOnly: true
+  - args:
+    - istio-iptables
+    - -p
+    - "15001"
+    - -z
+    - "15006"
+    - -u
+    - "1337"
+    - -m
+    - REDIRECT
+    - -i
+    - '*'
+    - -x
+    - ""
+    - -b
+    - '*'
+    - -d
+    - 15090,15021,15020
+    image: docker.io/istio/proxyv2:1.9.0
+    imagePullPolicy: Never
+    name: istio-init
+    resources:
+      limits:
+        cpu: "2"
+        memory: 1Gi
+      requests:
+        cpu: 1m
+        memory: 1M
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        add:
+        - NET_ADMIN
+        - NET_RAW
+        drop:
+        - ALL
+      privileged: false
+      readOnlyRootFilesystem: false
+      runAsGroup: 0
+      runAsNonRoot: false
+      runAsUser: 0
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-editor-token-5mjr7
+      readOnly: true
+  nodeName: minikf
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext:
+    fsGroup: 1337
+  serviceAccount: default-editor
+  serviceAccountName: default-editor
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - emptyDir:
+      medium: Memory
+    name: istio-envoy
+  - emptyDir: {}
+    name: istio-data
+  - downwardAPI:
+      defaultMode: 420
+      items:
+      - fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.labels
+        path: labels
+      - fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.annotations
+        path: annotations
+      - path: cpu-limit
+        resourceFieldRef:
+          containerName: istio-proxy
+          divisor: 1m
+          resource: limits.cpu
+      - path: cpu-request
+        resourceFieldRef:
+          containerName: istio-proxy
+          divisor: 1m
+          resource: requests.cpu
+    name: istio-podinfo
+  - name: istio-token
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          audience: istio-ca
+          expirationSeconds: 43200
+          path: istio-token
+  - configMap:
+      defaultMode: 420
+      name: istio-ca-root-cert
+    name: istiod-ca-cert
+  - name: workspace-okay1-s1co164ke
+    persistentVolumeClaim:
+      claimName: workspace-okay1-s1co164ke
+  - emptyDir:
+      medium: Memory
+    name: dshm
+  - name: default-editor-token-5mjr7
+    secret:
+      defaultMode: 420
+      secretName: default-editor-token-5mjr7
+  - name: volume-ml-pipeline-token
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          audience: pipelines.kubeflow.org
+          expirationSeconds: 99999
+          path: token
+  - name: projected-rok-token
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          audience: rok
+          expirationSeconds: 99999
+          path: token
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2021-12-13T13:04:53Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2021-12-13T13:04:59Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2021-12-13T13:04:59Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2021-12-13T13:04:35Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://47695b316347ff5f35a9b5e2c4299d3539d40b48d2344ab47f63a8942f78b87a
+    image: istio/proxyv2:1.9.0
+    imageID: docker-pullable://istio/proxyv2@sha256:286b821197d7a9233d1d889119f090cd9a9394468d3a312f66ea24f6e16b2294
+    lastState: {}
+    name: istio-proxy
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2021-12-13T13:04:57Z"
+  - containerID: docker://9052f70a693832d716151ef791ccf37ee8f85cc3c1ba6c074fc6a567bd1ef128
+    image: gcr.io/arrikto/jupyter-kale-py36:develop-l0-release-1.2-pre-295-g622fe91aca
+    imageID: docker-pullable://gcr.io/arrikto/jupyter-kale-py36@sha256:5c30d30c0459b0d7597293900be0897d5595a819f5a8311765cd928f87835d44
+    lastState: {}
+    name: okay1
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2021-12-13T13:04:54Z"
+  hostIP: 10.10.10.10
+  initContainerStatuses:
+  - containerID: docker://623199a899336850763d8bf65e61a3455aa886660dca33ee169230897493856c
+    image: sha256:5d794711f8601a29ee4095c2cff8f14e69aced79a400008fa9c252fc43d22d24
+    imageID: docker-pullable://gcr.io/arrikto-public/startup-lock-init@sha256:0fbe996a2f6b380d7c566ba16255ec034faec983c2661da778fe09b3e744ad21
+    lastState: {}
+    name: startup-lock-init-container
+    ready: true
+    restartCount: 0
+    state:
+      terminated:
+        containerID: docker://623199a899336850763d8bf65e61a3455aa886660dca33ee169230897493856c
+        exitCode: 0
+        finishedAt: "2021-12-13T13:04:48Z"
+        reason: Completed
+        startedAt: "2021-12-13T13:04:48Z"
+  - containerID: docker://f365f99a9b56a6095fe6c59591586c36c9aa2ca3ef6cc32532af407b12ffc1b3
+    image: istio/proxyv2:1.9.0
+    imageID: docker-pullable://istio/proxyv2@sha256:286b821197d7a9233d1d889119f090cd9a9394468d3a312f66ea24f6e16b2294
+    lastState: {}
+    name: istio-init
+    ready: true
+    restartCount: 0
+    state:
+      terminated:
+        containerID: docker://f365f99a9b56a6095fe6c59591586c36c9aa2ca3ef6cc32532af407b12ffc1b3
+        exitCode: 0
+        finishedAt: "2021-12-13T13:04:52Z"
+        reason: Completed
+        startedAt: "2021-12-13T13:04:52Z"
+  phase: Running
+  podIP: 172.17.0.68
+  podIPs:
+  - ip: 172.17.0.68
+  qosClass: Burstable
+  startTime: "2021-12-13T13:04:35Z"
