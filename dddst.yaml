@@ -1,0 +1,12 @@
+apiVersion: "serving.kserve.io/v1alpha2"
+kind: "InferenceService"
+metadata:
+  annotations:
+    sidecar.istio.io/inject: 'false'
+  name: "cat-detect"
+spec:
+  predictor:
+    tensorflow:
+      runtimeVersion: 2.5.2
+      storageUri: "gs://kfserving-examples/models/tensorflow/flowers"
+  minReplicas: 0
