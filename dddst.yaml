@@ -8,5 +8,5 @@ spec:
   predictor:
     tensorflow:
       runtimeVersion: 2.5.2
-      storageUri: "gs://kfserving-examples/models/tensorflow/flowers"
+      storageUri: "pvc://workspace-cat-breed-bwxnr12cc/models/tensorflow/"
   minReplicas: 0
